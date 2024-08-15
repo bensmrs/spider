@@ -1,6 +1,13 @@
-(** This module provides a common signature for formatters *)
+(** This module provides common signatures for formatters *)
 
-module type S = sig
+(** Handler-specific signature *)
+module type M = sig
   (** Format a store *)
   val format : Store.t -> unit
+end
+
+(** Complete signature *)
+module type S = sig
+  include Handler.T
+  include M
 end

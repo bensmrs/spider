@@ -1,6 +1,13 @@
-(** This module provides a common signature for resource parsers *)
+(** This module provides common signatures for resource parsers *)
 
-module type S = sig
+(** Handler-specific signature *)
+module type M = sig
   (** Parse a resource content *)
   val parse : Resource.t -> Target.link list
+end
+
+(** Complete signature *)
+module type S = sig
+  include Handler.T
+  include M
 end

@@ -1,10 +1,16 @@
-(** This module provides a common signature for schemes *)
+(** This module provides common signatures for schemes *)
 
+(** Handler-specific signature *)
+module type M = Scheme_sig.M
+
+(** Complete signature *)
 module type S = sig
-  (** Get a resource *)
-  val get : Store.t -> Uri.t -> Resource.t list
+  include Handler.T
+  include M
 end
 
-module type M = sig
-  module Make : functor (_ : S) -> S
+(** Wrapper signature *)
+module type W = sig
+  (** Dispatch functor *)
+  module Make : functor (_ : Schemes_sig.S) -> S
 end

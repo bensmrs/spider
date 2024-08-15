@@ -7,8 +7,9 @@ module String_map = Map.Make(String)
 (** This self-referencing module allows cyclic dispatching *)
 module rec Dispatch : Schemes_sig.S = struct
   (** The map of supported schemes *)
-  let schemes = [%map "http"  => (module Http.Make (Dispatch) : Scheme.S);
-                      "https" => (module Http.Make (Dispatch) : Scheme.S)]
+
+  let%handler.Scheme schemes = [%map "http"  => (module Http.Make (Dispatch));
+                                     "https" => (module Http.Make (Dispatch))]
   
   (** Return whether a scheme is supported *)
   let can_handle scheme = String_map.mem scheme schemes

@@ -2,8 +2,8 @@
 
 module String_map = Map.Make(String)
 
-(** The map of supported formatters *)
-let formatters = [%map "dot" => (module Dot : Formatter.S)]
+let%handler.Formatter formatters = [%map "dot"    => (module Dot);
+                                         "report" => (module Report)]
 
 (** Return whether a formatter is supported *)
 let can_handle format = String_map.mem format formatters

@@ -1,8 +1,5 @@
 (** This module provides the spider logic *)
 
-(** Export the Rule submodule *)
-module Rule = Rule
-
 (** Prepend list with an optional value *)
 let (^::) hd tl = Option.fold ~none:tl ~some:(fun e -> e::tl) hd
 
@@ -58,3 +55,9 @@ let process ?(jobs=1) ?rules ?(max_depth=100) ?(max_offset=0) base =
 
 (** Format the crawling results *)
 let format = Formatters.format
+
+(** Export the Formatters submodule *)
+module Formatters = Formatters
+
+(** Export the Rule submodule *)
+module Rule = Rule

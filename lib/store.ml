@@ -60,3 +60,10 @@ let fold f init { mutex; store; _ } =
   let result = UriHashtbl.fold (fun k v acc -> f acc k v) store init in
   Mutex.unlock mutex;
   result
+
+(** Get the store size *)
+let length { mutex; store; _ } =
+  Mutex.lock mutex;
+  let result = UriHashtbl.length store in
+  Mutex.unlock mutex;
+  result

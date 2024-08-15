@@ -1,6 +1,9 @@
 (** This modules provides a parser for HTML documents *)
 
-(** There is a concurrency problem in one of Lambda Soup’s dependencies *)
+(** The handler description *)
+let description = "parse HTML documents"
+
+(** There is a concurrency problem in one of Lambda Soup’s dependencies; this mutex deals with it *)
 let mutex = Mutex.create ()
 
 (** Parse a raw HTML body and extract its connections *)

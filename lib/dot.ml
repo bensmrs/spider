@@ -1,5 +1,8 @@
 (** This module formats crawling results as a DOT graph *)
 
+(** The formatter description *)
+let description = "output a Graphviz file"
+
 (** Format a resource status *)
 let format_status = function
   | Some (Status.Information _) -> "white"

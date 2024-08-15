@@ -2,7 +2,11 @@
 
 open Util
 
-module Make (Dispatch : Scheme.S) : Scheme.S = struct
+(** Dispatch functor *)
+module Make (Dispatch : Schemes_sig.S) : Scheme.S = struct
+  (** The scheme description *)
+  let description = "handle HTTP/s schemes"
+
   (** Get an HTTP header *)
   let rec get_header header = function
     | (h, value)::_ when String.lowercase_ascii h = header -> Some value

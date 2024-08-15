@@ -2,6 +2,8 @@
 
 open Cmdliner
 
+module String_map = Map.Make(String)
+
 (** Crawling limits section name *)
 let s_limits = "CRAWLING LIMITS"
 
@@ -39,8 +41,9 @@ let max_offset =
 (** Post-processor for inclusion and exclusion rules.
     It should be noted that [args] is provided in LIFO. *)
 let process_include (_, args) =
+  let open Spiderlib.Rule in
   let rec parse_rules acc = function
-    | "--include"::value::tl -> parse_rules (Spider.Rule.Include (Uri.of_string value)::acc) tl
+    | "--include"::value::tl -> parse_rules (Include (Uri.of_string value)::acc) tl
     | "--exclude"::value::tl -> parse_rules (Exclude (Uri.of_string value)::acc) tl
     | [] -> acc
     | _ -> failwith "Unreachable" in
@@ -48,8 +51,8 @@ let process_include (_, args) =
   (* Here, the rules are in the right order again. We then insert a reject-all or an accept-all rule
      to ensure the crawler’s internal URI matching is exhaustive *)
   match rules with
-    | Spider.Rule.Include _::_ -> Spider.Rule.Exclude (Uri.of_string "*:")::rules |> Option.some
-    | Spider.Rule.Exclude _::_ -> Spider.Rule.Include (Uri.of_string "*:")::rules |> Option.some
+    | Include _::_ -> Exclude (Uri.of_string "*:")::rules |> Option.some
+    | Exclude _::_ -> Include (Uri.of_string "*:")::rules |> Option.some
     | [] -> None
 
 (** Inclusion and exclusion option *)
@@ -82,6 +85,19 @@ let robots =
              reject-all or accept-all rule." in
   Arg.(info ["robots"] ~docs:s_filtering ~doc |> flag |> value)
 
+(** [formatter => description] map *)
+let formatters = Spiderlib.Formatters.list () |> List.fold_left (fun acc fmt ->
+  String_map.add fmt (Spiderlib.Formatters.description fmt) acc) [%map.String]
+
+(** Output format *)
+let format =
+  let opts = String_map.fold (fun k v acc -> [%string "$(b,%{k}) (%{v})"]::acc) formatters []
+             |> List.rev |> Util.pp_list in
+  let doc = [%string "The output format. Possible values are %{opts}."] in
+  Arg.(info ["f"; "format"] ~docv:"FORMAT" ~doc
+  |> opt (String_map.fold (fun k _ acc -> (k, k)::acc) formatters [] |> List.rev |> enum) "report"
+  |> value)
+
 (** Base URI argument *)
 let base =
   let doc = "The base resource URIs to crawl. Schemes must be specified (e.g. \
@@ -90,8 +106,8 @@ let base =
   Arg.(info [] ~docv:"URI" ~doc |> pos_all uri [] |> non_empty)
 
 (** Glue between [Cmdliner] and [Spider] *)
-let main jobs max_depth max_offset rules _robots base =
-  Spider.process ~jobs ?rules ~max_depth ~max_offset base |> Spider.format "dot"
+let main jobs max_depth max_offset rules _robots format base =
+  Spiderlib.process ~jobs ?rules ~max_depth ~max_offset base |> Spiderlib.format format
 
 (** Command-line entry point *)
 let () =
@@ -111,5 +127,5 @@ let () =
              `P "The URIs explored by the crawler can be filtered with the following options.";
              ] in
   let info = Cmd.info "spider" ~version:"0.1" ~doc ~man in
-  Cmd.v info Term.(const main $ jobs $ max_depth $ max_offset $ rules $ robots $ base) |> Cmd.eval
-  |> exit
+  Cmd.v info Term.(const main $ jobs $ max_depth $ max_offset $ rules $ robots $ format $ base)
+  |> Cmd.eval |> exit

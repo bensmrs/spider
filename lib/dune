@@ -1,5 +1,5 @@
 (library
- (name spider)
+ (name spiderlib)
  (libraries ezcurl lambdasoup str uri)
- (modules_without_implementation formatter handler parser scheme schemes_sig)
- (preprocess (pps ppx_map ppx_string)))
+ (modules_without_implementation formatter parser scheme scheme_sig schemes_sig)
+ (preprocess (pps ppx_handler ppx_map ppx_string)))

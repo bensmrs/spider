@@ -1,3 +1,4 @@
 (executable
  (name spider)
- (libraries cmdliner spider))
+ (libraries cmdliner spiderlib)
+ (preprocess (pps ppx_map ppx_string)))

@@ -13,3 +13,5 @@ val add_connection : t -> ?status:Status.t -> Uri.t * Kind.t -> Uri.t -> Uri.t o
 val set_status : t -> Uri.t -> Status.t option -> unit
 (** Fold over the storage backend *)
 val fold : ('acc -> Uri.t -> entry -> 'acc) -> 'acc -> t -> 'acc
+(** Get the store size *)
+val length : t -> int

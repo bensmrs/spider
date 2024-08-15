@@ -4,8 +4,7 @@ open Util
 
 module String_map = Map.Make(String)
 
-(** The map of supported parsers *)
-let parsers = [%map "text/html" => (module Html : Parser.S)]
+let%handler.Parser parsers = [%map "text/html" => (module Html)]
 
 (** Return whether a MIME type is supported *)
 let can_handle mime = String_map.mem mime parsers
