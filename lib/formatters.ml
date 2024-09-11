@@ -3,6 +3,7 @@
 module String_map = Map.Make(String)
 
 let%handler.Formatter formatters = [%map "dot"    => (module Dot);
+                                         "md"     => (module Markdown);
                                          "report" => (module Report)]
 
 (** Return whether a formatter is supported *)
